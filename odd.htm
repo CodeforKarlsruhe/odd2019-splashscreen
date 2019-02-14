@@ -1,0 +1,276 @@
+<html>
+<head>
+<title>Open Data Examples ODD19 at ZKM</title>
+<meta charset="utf-8">
+
+<!-- ---------------------------------------------------------------------- -->
+
+<script>
+
+var urls = [
+  "https://opendataday.org/#map",
+
+  "https://okfn.de/",
+  "https://okfn.de/projekte/fragdenstaat",
+  "https://okfn.de/projekte/demokratielabore/",
+  "https://okfn.de/projekte/jugendhackt/",
+  "https://okfn.de/projekte/codeforde/",
+  "https://codefor.de/",
+  "https://codefor.de/karlsruhe/",
+    "https://okfn.de/projekte/ogp/",
+    "https://okfn.de/projekte/offenerhaushalt/",
+    "https://offenerhaushalt.de/",
+    "https://okfn.de/projekte/offenegesetze/",
+    "https://okfn.de/projekte/openschufa/",
+    "https://okfn.de/projekte/edulabs/",
+
+    "https://osmlab.github.io/show-me-the-way/",
+    "https://dlmultimedia.esa.int/download/public/videos/2016/05/032/1605_032_AR_EN.mp4",
+    "https://transparenz.karlsruhe.de/",
+
+    "https://offeneregister.de/",
+
+  "http://127.0.0.1:8080/#/chapter-slide-3-1"
+];
+
+var navs = [
+  "Der Open Data Day ist eine jährlich stattfindende Veranstaltung, um international \
+  auf die Bedeutung offener Daten hinzuweisen. Zum neunten Mal werden lokale \
+  Interessensgruppen rund um die Welt durch verschiedene Aktivitäten auf die Bedeutung \
+  offener Daten hinweisen. Der Open Data Day ist eine gute Gelegenheit auf die Vorteile \
+  offener Daten hinzuweisen und den Stellenwert innerhalb von Verwaltung, der \
+  Wirtschaft und der Zivilgesellschaft zu erhöhen."
+]
+
+var uidx = 0
+var tm = 0
+const tms = 100 // milliseconds for timer
+const slideDuration = 20 // in seconds
+var tp = slideDuration * 1000  // period in ms
+var timer
+var fscale = .9 // initial frame scale
+var sct = 0 // scroll timer
+
+const maxheight = 1000 // mobiles have infinite window height ...
+
+//var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+//var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+// /////////////////////////////////////////
+function updateUrl(){
+  tm += tms
+  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  var frameurl = document.getElementById("frameurl");
+  var hg = Math.min(maxheight, h - 200) + "px" // fixed boarder is better
+  frameurl.style.height = hg;
+  var nav = document.getElementById("nav");
+  nav.style.height = hg;
+  var frameurl = document.getElementById("frameurl");
+  if (tm >= tp ) {
+    tm = 0
+    uidx++
+    if (uidx >= urls.length) uidx = 0
+    frameurl.src = urls[uidx]
+    var footer = document.getElementById("footer");
+    footer.innerHTML = urls[uidx]
+    var nav = document.getElementById("nav");
+    nav.innerHTML = navs[uidx]
+    //alert("next")
+  }
+  // shrink iframe toward end
+  if (tm > tp * .9){
+    fscale *= .9
+  } else if (tm > tp * .05) {
+    fscale =.9
+  }
+  frameurl.style.transform = "scale(" + fscale + "," + fscale + ")"; // ".5,.5)";
+
+  // scroll heigth
+  var sh = document.getElementById("nav").scrollHeight
+  console.log("sh,hg: ", sh,Math.min(maxheight, h - 200))
+  if (sh > Math.min(maxheight, h - 200) + 10) {
+    if (sct > 20) {
+      sct = 0
+      var nav_ = document.getElementById("nav").innerHTML.split(".")
+      nav_.shift()
+      document.getElementById("nav").innerHTML = nav_.join(".")
+    } else
+      sct ++
+  }
+
+}
+
+// /////////////////////////////////////////
+function faster(){
+  if (tp > (slideDuration * 1000) / 10) tp *= .8;
+  document.getElementById("speed").innerHTML = Math.floor(tp / 1000)
+  // force update here
+  tm = tp + 1
+  updateUrl()
+}
+
+// /////////////////////////////////////////
+function slower(){
+  if (tp < (slideDuration * 1000) * 10) tp *= 1.2;
+  document.getElementById("speed").innerHTML = Math.floor(tp / 1000)
+}
+
+// /////////////////////////////////////////
+function loadUrls(){
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+         // Typical action to be performed when the document is ready:
+         //document.getElementById("nav").innerHTML = xhttp.responseText;
+         // var csvData = new Array();
+         var rows = xhttp.responseText.split(/\r?\n|\r/);
+         console.log("rows: ", rows.length)
+         if (rows.length > 0) {
+           urls = []
+           navs = []
+           for (var i = 0; i < rows.length; i++) {
+             items = rows[i].split('\t')
+             if (items[0] == "") continue
+             urls.push(items[0])
+             // limit text to 500 characters if no scrolling
+             nav = items[1] // .substr(0,500)
+             navs.push(nav)
+           }
+
+         }
+      }
+  };
+
+  //window.location.protocol = "http:"
+  //window.location.host = "css-tricks.com"
+  //window.location.pathname = "example/index.html"
+  //window.location.port  // not neceessarily set if port 80
+  const csvFile = "oddUrls.tsv"
+  var path = window.location.pathname.split("/")
+  if (path[0] == "") path.shift()
+  //console.log("pathname: ",window.location.pathname)
+  //console.log("path,len: ",path,path.length)
+  var fpath = ""
+  for (i=0; i < path.length - 1; i++){  // ommit last
+    fpath += path.shift() + "/"
+    console.log("fpath: ",fpath)
+  }
+
+  var csvUrl = window.location.protocol + "//" + window.location.host + "/" + fpath + "/" + csvFile // use tab separated to avoid confusion with " and ,"
+
+  xhttp.open("GET", csvUrl, true);
+  xhttp.send();
+}
+
+// /////////////////////////////////////////
+function JSrun() {
+  //alert("jsrun")
+
+  // change the footer text
+  // get all elements
+  var head = document.getElementById("head");
+  var footer = document.getElementById("footer");
+  var footer = document.getElementById("footer");
+  footer.innerHTML = urls[uidx]
+  var frameurl = document.getElementById("frameurl");
+  frameurl.src = urls[uidx]
+  var nav = document.getElementById("nav");
+  nav.innerHTML = navs[uidx]
+  document.getElementById("speed").innerHTML = Math.floor(tp / 1000)
+
+  loadUrls()
+
+  timer = setInterval(updateUrl, 100);
+
+}
+
+
+</script>
+
+<!-- ---------------------------------------------------------------------- -->
+
+<style>
+td {background:lightgrey; vertical-align:top; text-align:left; border:1px solid black; padding:2px 10px}
+pre {margin:0}
+table {border-collapse:collapse; table-layout:fixed}
+body {background:lightyellow; font-family:Arial}
+#nav {display:block; border:none; width:90%; text-align:left; vertical-align: bottom; font-size:150%; overflow:hidden; text-overflow:clip;}
+#head {text-align:center; font-size:300%; font-weight:bold}
+#footer {text-align:center; vertical-align: middle; font-size:200%; }
+#frameurl {
+  background-color:white;
+  /* min-height: 800px; */
+}
+
+#frame {
+/*  background-image: url("./logo.png");*/
+  background-image: url("./okMap.png");
+/*  background-repeat: no-repeat;*/
+  background-repeat: repeat-y;
+  background-size: contain; /* more options: cover; auto; */
+  background-position: center-top;
+/*  height:100%; */
+/*  min-height: 900px;*/
+}
+
+</style>
+
+</head>
+
+<body onload="JSrun()"><!-- onpaste="return false;"-->
+<!--
+we have a large table
+top row is current title
+second row holds new <table>
+  left col 10% is info text or navigation
+  right col 90% is iframe
+third row is OKF info, logos etc
+</table>
+
+</table>
+-->
+
+<table id="outer" width="100%">
+<tr>
+  <td id="head" height="10%">
+      World of Open Data - OpenDataDay 2019 @ ZKM Karlsruhe
+  </td>
+</tr>
+<tr>
+  <td>
+    <table id="inner" width="100%" height="100%">
+    <tr>
+      <td id="nav" width="20%">
+        Navigation
+      </td>
+      <td id="frame" width="80%">
+        <iframe id="frameurl" width="100%" height="600px" src="http://127.0.0.1:8080/#/chapter-slide-1-1" allowfullscreen="false" frameborder="0"></iframe>
+      </td>
+    </tr>
+    </table>
+  </td>
+  </tr>
+  <tr>
+    <table width=100%>
+      <tr>
+        <td id="ctl" width="10%">
+          <p>
+          <input type="button" value="Faster" img src="./logo.png" align="left" onclick="faster()">
+          <input type="button" value="Slower" img src="./logo.png" align="right" onclick="slower()">
+        </p>
+        <p id="speed"></p>
+        </td>
+        <td id="footer" height="10%" width="90%">
+          Footer
+        </td>
+        <td width="10%">
+          <img src="./logo.png" align="right">
+        </td>
+      </tr>
+</table>
+  </tr>
+</table>
+
+</body>
+</html>
