@@ -9,29 +9,7 @@
 <script>
 
 var urls = [
-  "https://opendataday.org/#map",
-
-  "https://okfn.de/",
-  "https://okfn.de/projekte/fragdenstaat",
-  "https://okfn.de/projekte/demokratielabore/",
-  "https://okfn.de/projekte/jugendhackt/",
-  "https://okfn.de/projekte/codeforde/",
-  "https://codefor.de/",
-  "https://codefor.de/karlsruhe/",
-    "https://okfn.de/projekte/ogp/",
-    "https://okfn.de/projekte/offenerhaushalt/",
-    "https://offenerhaushalt.de/",
-    "https://okfn.de/projekte/offenegesetze/",
-    "https://okfn.de/projekte/openschufa/",
-    "https://okfn.de/projekte/edulabs/",
-
-    "https://osmlab.github.io/show-me-the-way/",
-    "https://dlmultimedia.esa.int/download/public/videos/2016/05/032/1605_032_AR_EN.mp4",
-    "https://transparenz.karlsruhe.de/",
-
-    "https://offeneregister.de/",
-
-  "http://127.0.0.1:8080/#/chapter-slide-3-1"
+  "https://opendataday.org/#map"
 ];
 
 var navs = [
@@ -156,6 +134,10 @@ function loadUrls(){
   //window.location.host = "css-tricks.com"
   //window.location.pathname = "example/index.html"
   //window.location.port  // not neceessarily set if port 80
+
+  // prepare url to load a local file from the same directory
+  // it looks like github supports CORS to all, so we don't need this any more
+  /*
   const csvFile = "oddUrls.tsv"
   var path = window.location.pathname.split("/")
   if (path[0] == "") path.shift()
@@ -166,8 +148,12 @@ function loadUrls(){
     fpath += path.shift() + "/"
     console.log("fpath: ",fpath)
   }
+  //var csvUrl = window.location.protocol + "//" + window.location.host + "/" + fpath + "/" + csvFile // use tab separated to avoid confusion with " and ,"
+  */
 
-  var csvUrl = window.location.protocol + "//" + window.location.host + "/" + fpath + "/" + csvFile // use tab separated to avoid confusion with " and ,"
+  // if CORS with github work, we should be able to load the url directly
+  // https://raw.githubusercontent.com/CodeforKarlsruhe/odd2019-splashscreen/master/oddUrls.tsv
+  var csvUrl = "https://raw.githubusercontent.com/CodeforKarlsruhe/odd2019-splashscreen/master/oddUrls.tsv"
 
   xhttp.open("GET", csvUrl, true);
   xhttp.send();
