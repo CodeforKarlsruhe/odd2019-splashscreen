@@ -192,7 +192,8 @@ function JSrun() {
 pre {margin:0}
 /*table {border-collapse:collapse; table-layout:fixed;vertical-align:top; text-align:left; border:1px solid black; padding:2px 10px}*/
 table {border-collapse:collapse; table-layout:fixed;vertical-align:top; text-align:left; border:none; padding:2px 10px}
-body {overflow:hidden;background:lightyellow; font-family:Arial}
+body {overflow:hidden;background:rgb(155,255,245); font-family:Arial}  /* lighter: 73,255,237 normal: 64, 224, 208, maybe 155,255,245
+  // complementary: 255,156,166 , 155,255,245
 
 /* classes */
 .space {height:10px; border:none; width:100%; }
@@ -204,10 +205,14 @@ body {overflow:hidden;background:lightyellow; font-family:Arial}
   padding: 10px;
   display:block; border:none; width:90%; text-align:left; font-size:150%; overflow:hidden; text-overflow:clip;
   background: lightgray; opacity: .8;
+  /* background: rgb(255,156,166); opacity: .8; */
+
 }
 
 #head {
-  background:lightgrey; vertical-align:middle; border:none; padding:2px 10px;
+  /* background:lightgrey; */
+  background:rgb(255,156,166);
+  vertical-align:middle; border:none; padding:2px 10px;
   text-align:center; font-size:300%; font-weight:bold;
   max-height: 50px;
   min-height: 100%;
@@ -216,7 +221,9 @@ body {overflow:hidden;background:lightyellow; font-family:Arial}
 }
 
 #footer {
-  background:lightgrey; border:none; padding:10px 10px;
+  /* background:lightgrey; */
+  background:rgb(255,156,166);
+  border:none; padding:10px 10px;
   text-align:center; vertical-align: middle; font-size:200%;
   max-height: 50px;
   min-height: 10%;
