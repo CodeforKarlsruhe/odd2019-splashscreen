@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>Open Data Examples ODD19 at ZKM</title>
@@ -49,9 +50,13 @@ const slideDuration = 20 // in seconds
 var tp = slideDuration * 1000  // period in ms
 var timer
 var fscale = .9 // initial frame scale
-var sct = 0 // scroll timer
 
-const maxheight = 1000 // mobiles have infinite window height ...
+// scrolling
+var scrollTimer = 0
+var scrollStart = tp / 5
+var scrollOffs = 0
+
+var maxheight = 2000 // mobiles have infinite window height ...
 
 //var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 //var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -59,13 +64,17 @@ const maxheight = 1000 // mobiles have infinite window height ...
 // /////////////////////////////////////////
 function updateUrl(){
   tm += tms
+  // firefox has innerHeight
   var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
   var frameurl = document.getElementById("frameurl");
-  var hg = Math.min(maxheight, h - 200) + "px" // fixed boarder is better
-  frameurl.style.height = hg;
+  var fh = Math.min(maxheight, h - 200) // frame height: fixed boarder is better
+  frameurl.style.height = fh + "px";
+  //console.log("client, window,fh: ",document.documentElement.clientHeight,window.innerHeight,fh)
+  //console.log("outer client: ",document.getElementById("outer").clientHeight)
+
   var nav = document.getElementById("nav");
-  nav.style.height = hg;
-  var frameurl = document.getElementById("frameurl");
+
+  // change url
   if (tm >= tp ) {
     tm = 0
     uidx++
@@ -73,30 +82,31 @@ function updateUrl(){
     frameurl.src = urls[uidx]
     var footer = document.getElementById("footer");
     footer.innerHTML = urls[uidx]
-    var nav = document.getElementById("nav");
-    nav.innerHTML = navs[uidx]
+    nav.innerHTML = navs[uidx] // set text. update scroll below
+    scrollTimer = 0
     //alert("next")
   }
-  // shrink iframe toward end
+
+  // scroll text after initial delay
+  nav.style.height = fh + "px"; // set height like frameurl
+  var sh = nav.scrollHeight // get text height
+  if (scrollTimer > scrollStart) {
+    if ((sh > fh + 10) && (scrollOffs < sh - fh)) {
+        scrollOffs += 2
+        nav.scrollTo(0,scrollOffs);
+        //console.log("sh,hg,iscroll: ", sh,fh,scrollOffs)
+    }
+  } else {
+    scrollTimer += tms
+  }
+
+  // shrink iframe towards end
   if (tm > tp * .9){
     fscale *= .9
   } else if (tm > tp * .05) {
     fscale =.9
   }
   frameurl.style.transform = "scale(" + fscale + "," + fscale + ")"; // ".5,.5)";
-
-  // scroll heigth
-  var sh = document.getElementById("nav").scrollHeight
-  console.log("sh,hg: ", sh,Math.min(maxheight, h - 200))
-  if (sh > Math.min(maxheight, h - 200) + 10) {
-    if (sct > 20) {
-      sct = 0
-      var nav_ = document.getElementById("nav").innerHTML.split(".")
-      nav_.shift()
-      document.getElementById("nav").innerHTML = nav_.join(".")
-    } else
-      sct ++
-  }
 
 }
 
@@ -191,19 +201,52 @@ function JSrun() {
 <!-- ---------------------------------------------------------------------- -->
 
 <style>
-td {background:lightgrey; vertical-align:top; text-align:left; border:1px solid black; padding:2px 10px}
+
+/* defaults */
 pre {margin:0}
-table {border-collapse:collapse; table-layout:fixed}
-body {background:lightyellow; font-family:Arial}
-#nav {display:block; border:none; width:90%; text-align:left; vertical-align: bottom; font-size:150%; overflow:hidden; text-overflow:clip;}
-#head {text-align:center; font-size:300%; font-weight:bold}
-#footer {text-align:center; vertical-align: middle; font-size:200%; }
-#frameurl {
-  background-color:white;
-  /* min-height: 800px; */
+/*table {border-collapse:collapse; table-layout:fixed;vertical-align:top; text-align:left; border:1px solid black; padding:2px 10px}*/
+table {border-collapse:collapse; table-layout:fixed;vertical-align:top; text-align:left; border:none; padding:2px 10px}
+body {overflow:hidden;background:lightyellow; font-family:Arial}
+
+/* classes */
+.space {height:10px; border:none; width:100%; }
+.ctl { padding:0; margin:0}
+
+/* elements */
+#nav {
+  margin: 10px;
+  padding: 10px;
+  display:block; border:none; width:90%; text-align:left; font-size:150%; overflow:hidden; text-overflow:clip;
+  background: lightgray; opacity: .8;
 }
 
+#head {
+  background:lightgrey; vertical-align:middle; border:none; padding:2px 10px;
+  text-align:center; font-size:300%; font-weight:bold;
+  max-height: 50px;
+  min-height: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+#footer {
+  background:lightgrey; border:none; padding:10px 10px;
+  text-align:center; vertical-align: middle; font-size:200%;
+  max-height: 50px;
+  min-height: 10%;
+}
+
+#frameurl {
+  background-color:white;
+}
+
+/*
 #frame {
+}
+*/
+
+
+#content {
 /*  background-image: url("./logo.png");*/
   background-image: url("./okMap.png");
 /*  background-repeat: no-repeat;*/
@@ -232,43 +275,51 @@ third row is OKF info, logos etc
 -->
 
 <table id="outer" width="100%">
-<tr>
-  <td id="head" height="10%">
-      World of Open Data - OpenDataDay 2019 @ ZKM Karlsruhe
-  </td>
-</tr>
-<tr>
-  <td>
-    <table id="inner" width="100%" height="100%">
-    <tr>
-      <td id="nav" width="20%">
-        Navigation
-      </td>
-      <td id="frame" width="80%">
-        <iframe id="frameurl" width="100%" height="600px" src="http://127.0.0.1:8080/#/chapter-slide-1-1" allowfullscreen="false" frameborder="0"></iframe>
-      </td>
-    </tr>
-    </table>
-  </td>
-  </tr>
   <tr>
-    <table width=100%>
-      <tr>
-        <td id="ctl" width="10%">
-          <p>
-          <input type="button" value="Faster" img src="./logo.png" align="left" onclick="faster()">
-          <input type="button" value="Slower" img src="./logo.png" align="right" onclick="slower()">
-        </p>
-        <p id="speed"></p>
-        </td>
-        <td id="footer" height="10%" width="90%">
-          Footer
-        </td>
-        <td width="10%">
-          <img src="./logo.png" align="right">
-        </td>
-      </tr>
-</table>
+    <td id="head">
+        World of Open Data - OpenDataDay 2019 @ ZKM Karlsruhe
+    </td>
+  </tr>
+
+  <tr><td class="space"></td></tr>
+
+  <tr width="100%" >
+    <td width="100%" height="100%">
+      <table id="content" width="100%" height="100%">
+        <tr>
+          <td id="nav" width="20%">
+            Navigation
+          </td>
+          <td id="frame" width="80%">
+            <iframe id="frameurl" width="100%" height="600px" src="http://127.0.0.1:8080/#/chapter-slide-1-1" allowfullscreen="false" frameborder="0"></iframe>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr><td class="space"></td></tr>
+
+  <tr>
+    <td>
+      <table width=100%>
+        <tr>
+          <td width="15%">
+            <p class="ctl">
+            <input type="button" value="Faster" img src="./logo.png" align="left" onclick="faster()">
+            <input type="button" value="Slower" img src="./logo.png" align="right" onclick="slower()">
+            </p>
+            <p class="ctl" id="speed"></p>
+          </td>
+          <td id="footer" width="70%">
+            Footer
+          </td>
+          <td width="15%">
+            <img src="./logo.png" align="right" height=50px;>
+          </td>
+        </tr>
+      </table>
+    </td>
   </tr>
 </table>
 
