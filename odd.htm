@@ -13,25 +13,38 @@ var urls = [
 ];
 
 var navs = [
-  "Der Open Data Day ist eine jährlich stattfindende Veranstaltung, um international \
-  auf die Bedeutung offener Daten hinzuweisen. Zum neunten Mal werden lokale \
-  Interessensgruppen rund um die Welt durch verschiedene Aktivitäten auf die Bedeutung \
-  offener Daten hinweisen. Der Open Data Day ist eine gute Gelegenheit auf die Vorteile \
-  offener Daten hinzuweisen und den Stellenwert innerhalb von Verwaltung, der \
-  Wirtschaft und der Zivilgesellschaft zu erhöhen."
+  "Der Open Data Day ist eine jährlich stattfindende Veranstaltung, um international auf die Bedeutung offener \
+Daten hinzuweisen. Zum neunten Mal werden lokale Interessensgruppen rund um die Welt durch verschiedene Aktivitäten \
+auf die Bedeutung offener Daten hinweisen. Der Open Data Day ist eine gute Gelegenheit auf die Vorteile offener Daten \
+hinzuweisen und den Stellenwert innerhalb von Verwaltung, der Wirtschaft und der Zivilgesellschaft zu erhöhen. \
+Im Rahmen des »Open Data Day« lädt das Open Knowledge Lab Karlsruhe gemeinsam mit der Stadt Karlsruhe und dem ZKM dazu ein, \
+sich in der Ausstellung »Open Codes« zu offenen Daten auszutauschen – den Schlüsselressourcen für gesellschaftliche und \
+wirtschaftliche Aktivitäten im digitalen Zeitalter. Auf der ganzen Welt finden am 2. März 2019 Veranstaltungen rund um \
+offene Daten statt – auch in Karlsruhe. Offene Daten (nicht nur von den öffentlichen Verwaltungen) und die Tools, um sie \
+auszuwerten schaffen Transparenz und ermöglichen demokratische Partizipation durch eine informierte gesellschaftliche Entscheidungsfindung. Um genau das zu unterstützen, lädt das Open Knowledge Lab Karlsruhe zum fünften Mal interessierte \
+Menschen zum Kennenlernen und zum Austausch ein. Unabhängig vom Alter und technischen Fähigkeiten – beim »Open Data Day« \
+kann jede/jeder mitmachen – egal ob du noch nie von offenen Daten gehört hast oder schon seit Jahren dabei bist. \
+Wir starten den »Open Data Day« um 11:00 Uhr mit einer Einführung in die Welt der offenen Daten am Beispiel aktueller \
+Projekte wie »Offene Gesetze« und »Topf-Secret«. Anschließend zeigen wir in einem lockeren Ablauf mit einer Reihe \
+kleiner Werkschauen, welche Projekte im OK Lab bearbeitet wurden und werden. Ein Schwerpunkt ist die Arbeit mit den \
+offenen Daten, die die Stadt Karlsruhe in ihrem Transzparenzportal zur Verfügung stellt. Wir zeigen erste Projekte zu \
+diesen Daten, mit denen wir im Laufe des Jahren im Rahmen von offenen Transparenzcafes weiter arbeiten werden. \
+Ein Überblick über die aktuellen und geplanten digitalen Beteiligungs- und Informationsmöglichkeiten der Stadt \
+macht deutlich, dass Karlsruhe hier auf dem richtigen Weg ist. Zwischendurch kann gefragt, diskutiert und \
+ausprobiert werden – wir haben einige Notebooks vorrätig und Ihr könnt gerne Eure eigenen mitbringen."
 ]
 
 var uidx = 0
 var tm = 0
 const tms = 100 // milliseconds for timer
-const slideDuration = 20 // in seconds
+const slideDuration = 40 // in seconds
 var tp = slideDuration * 1000  // period in ms
 var timer
 var fscale = .9 // initial frame scale
 
 // scrolling
 var scrollTimer = 0
-var scrollStart = tp / 5
+var scrollStart = Math.min(3000, tp / 5)
 var scrollOffs = 0
 
 var maxheight = 2000 // mobiles have infinite window height ...
@@ -69,8 +82,8 @@ function updateUrl(){
   nav.style.height = fh + "px"; // set height like frameurl
   var sh = nav.scrollHeight // get text height
   if (scrollTimer > scrollStart) {
-    if ((sh > fh + 10) && (scrollOffs < sh - fh)) {
-        scrollOffs += 2
+    if ((sh > fh + 5) && (scrollOffs < sh - fh)) {
+        scrollOffs += 5
         nav.scrollTo(0,scrollOffs);
         //console.log("sh,hg,iscroll: ", sh,fh,scrollOffs)
     }
@@ -80,7 +93,8 @@ function updateUrl(){
 
   // shrink iframe towards end
   if (tm > tp * .9){
-    fscale *= .9
+	if (fscale > .01)
+	    fscale *= .9
   } else if (tm > tp * .05) {
     fscale =.9
   }
