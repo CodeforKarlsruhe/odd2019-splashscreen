@@ -75,6 +75,8 @@ function updateUrl(){
     footer.innerHTML = urls[uidx]
     nav.innerHTML = navs[uidx] // set text. update scroll below
     scrollTimer = 0
+	scrollOffs = 0
+    nav.scrollTo(0,scrollOffs);
     //alert("next")
   }
 
