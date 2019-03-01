@@ -52,13 +52,33 @@ var maxheight = 2000 // mobiles have infinite window height ...
 //var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 //var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
+var topics = ["Programm ...","11:00 Uhr Open Data Beispiele","12:00 Uhr Transparenzportal: Open Data in Karlsruhe",
+	"13:00 OK Lab Projekte und Ideen","14:00 Diskussion Transparenzcafe",
+	"Ab 15:00 Workshops: Transparenzportal, Daten-API, Visualisierungen, Frag den Staat"
+]
+
+var topicIdx = 0
+var topicTm = 0
+var topicPeriod = 1000*10 // seconds
+
+
+// /////////////////////////////////////////
+function updateProgram(){
+	topicTm += tms
+	if ((topicTm >= topicPeriod) || ((topixIdx == 0) && (topicTm >= topicPeriod/3))) {
+		topicTm = 0
+		topicIdx ++
+		if (topicIdx >= topics.length) topicIdx = 0
+		document.getElementById("program").innerHTML = topics[topicIdx]
+	}
+}
 // /////////////////////////////////////////
 function updateUrl(){
   tm += tms
   // firefox has innerHeight
   var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
   var frameurl = document.getElementById("frameurl");
-  var fh = Math.min(maxheight, h - 200) // frame height: fixed boarder is better
+  var fh = Math.min(maxheight, h - 230) // frame height: fixed boarder is better
   frameurl.style.height = fh + "px";
   //console.log("client, window,fh: ",document.documentElement.clientHeight,window.innerHeight,fh)
   //console.log("outer client: ",document.getElementById("outer").clientHeight)
@@ -101,6 +121,8 @@ function updateUrl(){
     fscale =.9
   }
   frameurl.style.transform = "scale(" + fscale + "," + fscale + ")"; // ".5,.5)";
+
+  updateProgram()
 
 }
 
@@ -191,6 +213,8 @@ function JSrun() {
   nav.innerHTML = navs[uidx]
   document.getElementById("speed").innerHTML = Math.floor(tp / 1000)
 
+  document.getElementById("program").innerHTML = topics[topicIdx]
+
   loadUrls()
 
   timer = setInterval(updateUrl, 100);
@@ -249,6 +273,14 @@ body {overflow:hidden;background:rgb(155,255,245); font-family:Arial}  /* lighte
   background-color:white;
 }
 
+/* program */
+#program {
+  margin:0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align:center; vertical-align: middle; font-size:150%;
+  width: 100%;
+}
 /*
 #frame {
 }
@@ -290,7 +322,7 @@ third row is OKF info, logos etc
     </td>
   </tr>
 
-  <tr><td class="space"></td></tr>
+  <tr><td class="program"><div id="program">Programm</div></td></tr>
 
   <tr width="100%" >
     <td width="100%" height="100%">
@@ -300,7 +332,7 @@ third row is OKF info, logos etc
             Navigation
           </td>
           <td id="frame" width="80%">
-            <iframe id="frameurl" width="100%" height="600px" src="http://127.0.0.1:8080/#/chapter-slide-1-1" allowfullscreen="false" frameborder="0"></iframe>
+            <iframe id="frameurl" width="100%" height="600px" src="https://opendataday.org/#map" allowfullscreen="false" frameborder="0"></iframe>
           </td>
         </tr>
       </table>
